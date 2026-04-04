@@ -43,6 +43,7 @@ public static class SeedData
 
         // Seed admin user
         await CreateUserAsync(userManager, "admin@vgc.ie", "Admin123!", "Admin");
+        await CreateUserAsync(userManager, "felix@vgc.ie", "Felix123!", "Admin");
 
         // Seed faculty user + profile
         var faculty = await CreateUserAsync(userManager, "faculty@vgc.ie", "Faculty123!", "Faculty");
