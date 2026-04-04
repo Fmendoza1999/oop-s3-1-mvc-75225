@@ -5,6 +5,7 @@
 
 <h2>All Students</h2>
 <a asp-action="Index" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+<a asp-action="CreateStudent" class="btn btn-primary mb-3 ms-2">+ Add Student</a>
 
 <table class="table table-striped">
     <thead>
@@ -13,7 +14,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
-            <th>Address</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -24,7 +25,10 @@
                 <td>@student.Name</td>
                 <td>@student.Email</td>
                 <td>@student.Phone</td>
-                <td>@student.Address</td>
+                <td>
+                    <a asp-action="EditStudent" asp-route-id="@student.Id"
+                       class="btn btn-sm btn-outline-primary">Edit</a>
+                </td>
             </tr>
         }
     </tbody>

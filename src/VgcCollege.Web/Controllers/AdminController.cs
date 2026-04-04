@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VgcCollege.Web.Data;
+using VgcCollege.Web.Models;
 
 namespace VgcCollege.Web.Controllers;
 
@@ -42,5 +43,62 @@ public class AdminController : Controller
             .Include(e => e.Course)
             .ToListAsync();
         return View(enrolments);
+    }
+
+    // Create student
+    public IActionResult CreateStudent()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateStudent(StudentProfile student)
+    {
+        if (ModelState.IsValid)
+        {
+            _db.StudentProfiles.Add(student);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Students");
+        }
+        return View(student);
+    }
+
+    // Edit student
+    public async Task<IActionResult> EditStudent(int id)
+    {
+        var student = await _db.StudentProfiles.FindAsync(id);
+        if (student == null) return NotFound();
+        return View(student);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditStudent(StudentProfile student)
+    {
+        if (ModelState.IsValid)
+        {
+            _db.StudentProfiles.Update(student);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Students");
+        }
+        return View(student);
+    }
+
+    // Release exam results
+    public async Task<IActionResult> Exams()
+    {
+        var exams = await _db.Exams
+            .Include(e => e.Course)
+            .ToListAsync();
+        return View(exams);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ToggleRelease(int id)
+    {
+        var exam = await _db.Exams.FindAsync(id);
+        if (exam == null) return NotFound();
+        exam.ResultsReleased = !exam.ResultsReleased;
+        await _db.SaveChangesAsync();
+        return RedirectToAction("Exams");
     }
 }

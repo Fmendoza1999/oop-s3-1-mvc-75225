@@ -1,0 +1,47 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.Exam>
+@{
+    ViewData["Title"] = "Manage Exams";
+}
+
+<h2>Manage Exam Results</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Course</th>
+            <th>Date</th>
+            <th>Results Released</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model)
+        {
+            <tr>
+                <td>@exam.Title</td>
+                <td>@exam.Course.Name</td>
+                <td>@exam.Date.ToShortDateString()</td>
+                <td>
+                    @if (exam.ResultsReleased)
+                    {
+                        <span class="badge bg-success">Released</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Provisional</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="ToggleRelease" method="post">
+                        <input type="hidden" name="id" value="@exam.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                            @(exam.ResultsReleased ? "Hide Results" : "Release Results")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
