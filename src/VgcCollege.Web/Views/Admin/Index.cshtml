@@ -1,0 +1,42 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.Branch>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Branches</h5>
+                <p class="card-text display-4">@Model.Count()</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Branches</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var branch in Model)
+        {
+            <tr>
+                <td>@branch.Name</td>
+                <td>@branch.Address</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-4">
+    <a asp-action="Students" class="btn btn-secondary me-2">View Students</a>
+    <a asp-action="Courses" class="btn btn-secondary me-2">View Courses</a>
+    <a asp-action="Enrolments" class="btn btn-secondary">View Enrolments</a>
+</div>

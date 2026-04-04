@@ -1,0 +1,36 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.AssignmentResult>
+@{
+    ViewData["Title"] = "My Grades";
+}
+
+<h2>My Assignment Grades</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No grades recorded yet.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Assignment</th>
+                <th>Score</th>
+                <th>Max Score</th>
+                <th>Feedback</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model)
+            {
+                <tr>
+                    <td>@result.Assignment.Title</td>
+                    <td>@result.Score</td>
+                    <td>@result.Assignment.MaxScore</td>
+                    <td>@result.Feedback</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

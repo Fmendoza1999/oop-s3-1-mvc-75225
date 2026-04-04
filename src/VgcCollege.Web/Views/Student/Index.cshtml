@@ -1,0 +1,23 @@
+﻿@model VgcCollege.Web.Models.StudentProfile
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<h2>Welcome, @Model.Name!</h2>
+
+<div class="card mt-4">
+    <div class="card-header">My Profile</div>
+    <div class="card-body">
+        <p><strong>Student Number:</strong> @Model.StudentNumber</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Phone:</strong> @Model.Phone</p>
+        <p><strong>Address:</strong> @Model.Address</p>
+        <p><strong>Date of Birth:</strong> @Model.DOB.ToShortDateString()</p>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="MyGrades" class="btn btn-primary me-2">My Grades</a>
+    <a asp-action="MyResults" class="btn btn-primary me-2">My Exam Results</a>
+    <a asp-action="MyAttendance" class="btn btn-primary">My Attendance</a>
+</div>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+@{
+    ViewData["Title"] = "Faculty Dashboard";
+}
+
+<h2>My Students</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No students assigned yet.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Enrol Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var enrolment in Model)
+            {
+                <tr>
+                    <td>@enrolment.Student.Name</td>
+                    <td>@enrolment.Course.Name</td>
+                    <td>@enrolment.EnrolDate.ToShortDateString()</td>
+                    <td>@enrolment.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-4">
+    <a asp-action="Gradebook" class="btn btn-primary">View Gradebook</a>
+</div>

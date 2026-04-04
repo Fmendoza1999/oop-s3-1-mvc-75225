@@ -1,0 +1,36 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+@{
+    ViewData["Title"] = "My Attendance";
+}
+
+<h2>My Attendance</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+
+@foreach (var enrolment in Model)
+{
+    <h4>@enrolment.Course.Name</h4>
+    @if (!enrolment.AttendanceRecords.Any())
+    {
+        <p class="text-muted">No attendance records yet.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Week</th>
+                    <th>Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in enrolment.AttendanceRecords.OrderBy(r => r.WeekNumber))
+                {
+                    <tr>
+                        <td>Week @record.WeekNumber</td>
+                        <td>@(record.Present ? "✅" : "❌")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
