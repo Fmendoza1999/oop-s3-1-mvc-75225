@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Add Exam Result";
+}
+
+<h2>Add Exam Result</h2>
+<a asp-action="Gradebook" class="btn btn-secondary mb-3">← Back to Gradebook</a>
+
+<form asp-action="AddExamResult" method="post">
+    <div class="mb-3">
+        <label class="form-label">Student</label>
+        <select name="studentProfileId" class="form-select" required>
+            <option value="">-- Select Student --</option>
+            @foreach (var student in ViewBag.Students)
+            {
+                <option value="@student.Id">@student.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Exam</label>
+        <select name="examId" class="form-select" required>
+            <option value="">-- Select Exam --</option>
+            @foreach (var exam in ViewBag.Exams)
+            {
+                <option value="@exam.Id">@exam.Title (@exam.Course.Name)</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Score</label>
+        <input type="number" name="score" class="form-control" min="0" max="100" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Grade</label>
+        <select name="grade" class="form-select" required>
+            <option value="">-- Select Grade --</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="F">F</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Result</button>
+</form>

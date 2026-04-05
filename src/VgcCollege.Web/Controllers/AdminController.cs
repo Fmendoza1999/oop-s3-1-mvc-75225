@@ -101,4 +101,48 @@ public class AdminController : Controller
         await _db.SaveChangesAsync();
         return RedirectToAction("Exams");
     }
+    // Attendance
+    public async Task<IActionResult> Attendance()
+    {
+        var enrolments = await _db.CourseEnrolments
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .Include(e => e.AttendanceRecords)
+            .ToListAsync();
+        return View(enrolments);
+    }
+
+    public async Task<IActionResult> MarkAttendance(int enrolmentId)
+    {
+        var enrolment = await _db.CourseEnrolments
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .Include(e => e.AttendanceRecords)
+            .FirstOrDefaultAsync(e => e.Id == enrolmentId);
+        if (enrolment == null) return NotFound();
+        return View(enrolment);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> MarkAttendance(int enrolmentId, int weekNumber, bool present)
+    {
+        var existing = await _db.AttendanceRecords
+            .FirstOrDefaultAsync(a => a.CourseEnrolmentId == enrolmentId && a.WeekNumber == weekNumber);
+
+        if (existing != null)
+        {
+            existing.Present = present;
+        }
+        else
+        {
+            _db.AttendanceRecords.Add(new AttendanceRecord
+            {
+                CourseEnrolmentId = enrolmentId,
+                WeekNumber = weekNumber,
+                Present = present
+            });
+        }
+        await _db.SaveChangesAsync();
+        return RedirectToAction("Attendance");
+    }
 }

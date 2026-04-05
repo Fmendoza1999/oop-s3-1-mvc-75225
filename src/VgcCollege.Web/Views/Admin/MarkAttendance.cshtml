@@ -1,0 +1,45 @@
+﻿@model VgcCollege.Web.Models.CourseEnrolment
+@{
+    ViewData["Title"] = "Mark Attendance";
+}
+
+<h2>Mark Attendance — @Model.Student.Name</h2>
+<h5 class="text-muted">@Model.Course.Name</h5>
+<a asp-action="Attendance" class="btn btn-secondary mb-3">← Back to Attendance</a>
+
+<form asp-action="MarkAttendance" method="post">
+    <input type="hidden" name="enrolmentId" value="@Model.Id" />
+    <div class="mb-3">
+        <label class="form-label">Week Number</label>
+        <input type="number" name="weekNumber" class="form-control" min="1" max="52" required />
+    </div>
+    <div class="mb-3">
+        <div class="form-check">
+            <input type="checkbox" name="present" value="true" class="form-check-input" id="present" />
+            <label class="form-check-label" for="present">Present</label>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Attendance</button>
+</form>
+
+@if (Model.AttendanceRecords.Any())
+{
+    <h4 class="mt-4">Attendance History</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Present</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Model.AttendanceRecords.OrderBy(r => r.WeekNumber))
+            {
+                <tr>
+                    <td>Week @record.WeekNumber</td>
+                    <td>@(record.Present ? "0" : "1")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

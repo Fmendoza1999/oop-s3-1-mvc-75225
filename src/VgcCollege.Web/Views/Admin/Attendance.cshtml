@@ -1,0 +1,32 @@
+﻿@model IEnumerable<VgcCollege.Web.Models.CourseEnrolment>
+@{
+    ViewData["Title"] = "Attendance";
+}
+
+<h2>Attendance Management</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Weeks Present</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var enrolment in Model)
+        {
+            <tr>
+                <td>@enrolment.Student.Name</td>
+                <td>@enrolment.Course.Name</td>
+                <td>@enrolment.AttendanceRecords.Count(r => r.Present) / @enrolment.AttendanceRecords.Count</td>
+                <td>
+                    <a asp-action="MarkAttendance" asp-route-enrolmentId="@enrolment.Id"
+                       class="btn btn-sm btn-outline-primary">Mark Attendance</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

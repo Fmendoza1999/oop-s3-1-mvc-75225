@@ -41,6 +41,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="Enrolments">Enrolments</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Attendance">Attendance</a>
+                            </li>
                         }
 
                         @if (User.IsInRole("Faculty"))
@@ -50,6 +53,9 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Faculty" asp-action="Gradebook">Gradebook</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Faculty" asp-action="AddExamResult">Add Exam Result</a>
                             </li>
                         }
 
