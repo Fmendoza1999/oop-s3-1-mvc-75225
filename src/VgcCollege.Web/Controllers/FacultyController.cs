@@ -24,7 +24,15 @@ public class FacultyController : Controller
         var userId = _userManager.GetUserId(User);
         var faculty = await _db.FacultyProfiles
             .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
-        if (faculty == null) return NotFound();
+
+        if (faculty == null)
+        {
+            var allEnrolments = await _db.CourseEnrolments
+                .Include(e => e.Student)
+                .Include(e => e.Course)
+                .ToListAsync();
+            return View(allEnrolments);
+        }
 
         var enrolments = await _db.CourseEnrolments
             .Include(e => e.Student)
@@ -41,23 +49,32 @@ public class FacultyController : Controller
         var faculty = await _db.FacultyProfiles
             .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
 
-        var results = await _db.AssignmentResults
-            .Include(r => r.Student)
-            .Include(r => r.Assignment)
-            .ThenInclude(a => a.Course)
-            .Where(r => r.Assignment.Course.Enrolments
-                .Any(e => e.FacultyProfileId == faculty!.Id))
-            .ToListAsync();
+        List<AssignmentResult> results;
+
+        if (faculty == null)
+        {
+            results = await _db.AssignmentResults
+                .Include(r => r.Student)
+                .Include(r => r.Assignment)
+                .ThenInclude(a => a.Course)
+                .ToListAsync();
+        }
+        else
+        {
+            results = await _db.AssignmentResults
+                .Include(r => r.Student)
+                .Include(r => r.Assignment)
+                .ThenInclude(a => a.Course)
+                .Where(r => r.Assignment.Course.Enrolments
+                    .Any(e => e.FacultyProfileId == faculty.Id))
+                .ToListAsync();
+        }
 
         return View(results);
     }
 
     public async Task<IActionResult> AddResult()
     {
-        var userId = _userManager.GetUserId(User);
-        var faculty = await _db.FacultyProfiles
-            .FirstOrDefaultAsync(f => f.IdentityUserId == userId);
-
         ViewBag.Students = await _db.StudentProfiles.ToListAsync();
         ViewBag.Assignments = await _db.Assignments
             .Include(a => a.Course)
@@ -122,5 +139,33 @@ public class FacultyController : Controller
         }
         await _db.SaveChangesAsync();
         return RedirectToAction("Gradebook");
+    }
+    public async Task<IActionResult> EnrolStudent()
+    {
+        ViewBag.Students = await _db.StudentProfiles.ToListAsync();
+        ViewBag.Courses = await _db.Courses.ToListAsync();
+        ViewBag.Faculty = await _db.FacultyProfiles.ToListAsync();
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EnrolStudent(int studentProfileId, int courseId, int? facultyProfileId)
+    {
+        var existing = await _db.CourseEnrolments
+            .FirstOrDefaultAsync(e => e.StudentProfileId == studentProfileId
+                                   && e.CourseId == courseId);
+        if (existing == null)
+        {
+            _db.CourseEnrolments.Add(new CourseEnrolment
+            {
+                StudentProfileId = studentProfileId,
+                CourseId = courseId,
+                FacultyProfileId = facultyProfileId,
+                EnrolDate = DateTime.Now,
+                Status = "Active"
+            });
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction("Enrolments");
     }
 }

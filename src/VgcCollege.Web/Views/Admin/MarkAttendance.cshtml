@@ -7,29 +7,36 @@
 <h5 class="text-muted">@Model.Course.Name</h5>
 <a asp-action="Attendance" class="btn btn-secondary mb-3">← Back to Attendance</a>
 
-<form asp-action="MarkAttendance" method="post">
-    <input type="hidden" name="enrolmentId" value="@Model.Id" />
-    <div class="mb-3">
-        <label class="form-label">Week Number</label>
-        <input type="number" name="weekNumber" class="form-control" min="1" max="52" required />
+<div class="card p-4 mb-4" style="max-width:400px">
+    <h5>Mark a week:</h5>
+    <div class="row g-2">
+        @for (int week = 1; week <= 12; week++)
+        {
+            var record = Model.AttendanceRecords.FirstOrDefault(r => r.WeekNumber == week);
+            var isPresent = record?.Present ?? false;
+            <div class="col-4">
+                <div class="card text-center p-2">
+                    <small>Week @week</small>
+                    <div>
+                        <a href="/Admin/ToggleAttendance?enrolmentId=@Model.Id&weekNumber=@week&present=true"
+                           class="btn btn-sm @(isPresent ? "btn-success" : "btn-outline-success")">✅</a>
+                        <a href="/Admin/ToggleAttendance?enrolmentId=@Model.Id&weekNumber=@week&present=false"
+                           class="btn btn-sm @(!isPresent ? "btn-danger" : "btn-outline-danger")">❌</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-    <div class="mb-3">
-        <div class="form-check">
-            <input type="checkbox" name="present" value="true" class="form-check-input" id="present" />
-            <label class="form-check-label" for="present">Present</label>
-        </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Save Attendance</button>
-</form>
+</div>
 
 @if (Model.AttendanceRecords.Any())
 {
-    <h4 class="mt-4">Attendance History</h4>
-    <table class="table table-striped">
+    <h4>Attendance History</h4>
+    <table class="table table-striped" style="max-width:400px">
         <thead>
             <tr>
                 <th>Week</th>
-                <th>Present</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -37,7 +44,16 @@
             {
                 <tr>
                     <td>Week @record.WeekNumber</td>
-                    <td>@(record.Present ? "0" : "1")</td>
+                    <td>
+                        @if (record.Present)
+                        {
+                            <span class="badge bg-success">Present ✅</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Absent ❌</span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

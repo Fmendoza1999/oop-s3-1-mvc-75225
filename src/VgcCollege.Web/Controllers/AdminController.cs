@@ -45,7 +45,6 @@ public class AdminController : Controller
         return View(enrolments);
     }
 
-    // Create student
     public IActionResult CreateStudent()
     {
         return View();
@@ -63,7 +62,7 @@ public class AdminController : Controller
         return View(student);
     }
 
-    // Edit student
+    [HttpGet]
     public async Task<IActionResult> EditStudent(int id)
     {
         var student = await _db.StudentProfiles.FindAsync(id);
@@ -74,16 +73,20 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> EditStudent(StudentProfile student)
     {
-        if (ModelState.IsValid)
-        {
-            _db.StudentProfiles.Update(student);
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Students");
-        }
-        return View(student);
+        var existing = await _db.StudentProfiles.FindAsync(student.Id);
+        if (existing == null) return NotFound();
+
+        existing.Name = student.Name;
+        existing.Email = student.Email;
+        existing.Phone = student.Phone;
+        existing.Address = student.Address;
+        existing.DOB = student.DOB;
+        existing.StudentNumber = student.StudentNumber;
+
+        await _db.SaveChangesAsync();
+        return RedirectToAction("Students");
     }
 
-    // Release exam results
     public async Task<IActionResult> Exams()
     {
         var exams = await _db.Exams
@@ -101,7 +104,7 @@ public class AdminController : Controller
         await _db.SaveChangesAsync();
         return RedirectToAction("Exams");
     }
-    // Attendance
+
     public async Task<IActionResult> Attendance()
     {
         var enrolments = await _db.CourseEnrolments
@@ -112,23 +115,25 @@ public class AdminController : Controller
         return View(enrolments);
     }
 
+    [HttpGet]
     public async Task<IActionResult> MarkAttendance(int enrolmentId)
     {
         var enrolment = await _db.CourseEnrolments
             .Include(e => e.Student)
             .Include(e => e.Course)
-            .Include(e => e.AttendanceRecords)
+            .Include(e => e.AttendanceRecords.OrderBy(a => a.WeekNumber))
+            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == enrolmentId);
         if (enrolment == null) return NotFound();
         return View(enrolment);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> MarkAttendance(int enrolmentId, int weekNumber, bool present)
+    [HttpGet]
+    public async Task<IActionResult> ToggleAttendance(int enrolmentId, int weekNumber, bool present)
     {
         var existing = await _db.AttendanceRecords
-            .FirstOrDefaultAsync(a => a.CourseEnrolmentId == enrolmentId && a.WeekNumber == weekNumber);
-
+            .FirstOrDefaultAsync(a => a.CourseEnrolmentId == enrolmentId
+                                   && a.WeekNumber == weekNumber);
         if (existing != null)
         {
             existing.Present = present;
@@ -143,6 +148,36 @@ public class AdminController : Controller
             });
         }
         await _db.SaveChangesAsync();
-        return RedirectToAction("Attendance");
+        return RedirectToAction("MarkAttendance", new { enrolmentId = enrolmentId });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EnrolStudent()
+    {
+        ViewBag.Students = await _db.StudentProfiles.ToListAsync();
+        ViewBag.Courses = await _db.Courses.ToListAsync();
+        ViewBag.Faculty = await _db.FacultyProfiles.ToListAsync();
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EnrolStudent(int studentProfileId, int courseId, int? facultyProfileId)
+    {
+        var existing = await _db.CourseEnrolments
+            .FirstOrDefaultAsync(e => e.StudentProfileId == studentProfileId
+                                   && e.CourseId == courseId);
+        if (existing == null)
+        {
+            _db.CourseEnrolments.Add(new CourseEnrolment
+            {
+                StudentProfileId = studentProfileId,
+                CourseId = courseId,
+                FacultyProfileId = facultyProfileId,
+                EnrolDate = DateTime.Now,
+                Status = "Active"
+            });
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction("Enrolments");
     }
 }
